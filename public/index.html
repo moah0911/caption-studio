@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Caption Studio — word-timed captions</title>
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="/icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo+Black&family=Luckiest+Guy&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- Dashboard -->
+  <main id="dashboard" class="screen">
+    <header class="dash-header">
+      <div class="dash-logo">
+        <span class="mark"></span>
+        <span class="mark-type">Caption<span class="thin">studio</span></span>
+      </div>
+      <div class="dash-actions">
+        <button id="new-project-btn" class="btn btn-primary">New project <kbd>N</kbd></button>
+      </div>
+    </header>
+    <section class="dash-body">
+      <div class="dash-hero">
+        <h1>Captions.<br/><span class="muted">Word by word.</span></h1>
+        <p>Upload a video or voice note. We transcribe it, style it, and render it for you — 9:16, 16:9, or square.</p>
+      </div>
+      <div id="project-list" class="project-grid"></div>
+      <div id="dashboard-empty" class="empty-state hidden">
+        <div class="empty-art"></div>
+        <h2>No projects yet</h2>
+        <p>Create your first caption project — drop a video or MP3 inside it.</p>
+        <button id="empty-new-btn" class="btn btn-primary large">Create project</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Editor -->
+  <main id="editor" class="screen hidden">
+    <header class="editor-topbar">
+      <button id="back-btn" class="icon-btn" aria-label="Back to projects">‹</button>
+      <div class="doc-title">
+        <span class="mark small"></span>
+        <div class="doc-name-wrap">
+          <input id="doc-name" class="doc-name" value="Untitled caption" spellcheck="false" />
+          <span id="save-state" class="save-state">Saved</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="ratio-chip" id="ratio-chip" role="button" tabindex="0" title="Toggle aspect ratio">
+          <span id="ratio-label">9:16</span>
+        </div>
+        <button id="export-btn" class="btn btn-primary export">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>
+          Export
+        </button>
+      </div>
+    </header>
+
+    <div class="editor-body">
+      <!-- Left rail -->
+      <nav class="rail" aria-label="Tools">
+        <button class="rail-btn active" data-tool="media" data-label="Media"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><polygon points="10.2,9.6 14.8,12 10.2,14.4" fill="currentColor" stroke="none"/></svg><span>Media</span></button>
+        <button class="rail-btn" data-tool="text" data-label="Text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7V5h14v2"/><path d="M12 5v14"/><path d="M9 19h6"/></svg><span>Text</span></button>
+        <button class="rail-btn" data-tool="trim" data-label="Auto Trim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><path d="M20 4L8.4 15.6M14.5 14.5L20 20M8.4 8.4L12 12"/></svg><span>Auto Trim</span></button>
+        <button class="rail-btn" data-tool="silence" data-label="Silence"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4"/><path d="M8 7v10"/><path d="M12 4v16"/><path d="M16 10v4"/><path d="M20 12v0"/></svg><span>Silence</span></button>
+        <button class="rail-btn" data-tool="style" data-label="Style"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1.4" fill="currentColor" stroke="none"/><circle cx="13" cy="8.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M12 21c-1.5-2-4-3-6-3"/></svg><span>Style</span></button>
+      </nav>
+
+      <!-- Panel -->
+      <section class="panel">
+        <div class="panel-head"><h2 id="panel-title">Media</h2></div>
+        <div class="panel-body">
+          <div class="panel-page" data-page="media">
+            <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Add media">
+              <div class="dz-icon">＋</div>
+              <div class="dz-text">Add media<small>video · mp3 · mov · wav</small></div>
+            </div>
+            <input type="file" id="file-input" accept="video/*,audio/*" hidden />
+            <div id="media-list" class="media-list"></div>
+            <div id="upload-progress" class="upload-progress hidden"><div class="bar"><div class="fill"></div></div><small>Uploading…</small></div>
+            <div class="panel-foot"><button id="transcribe-btn" class="btn btn-ghost">Transcribe</button></div>
+          </div>
+
+          <div class="panel-page hidden" data-page="text">
+            <div class="row between"><span class="k">Captions</span><span id="caption-stats" class="stats">0 words · 0 lines</span></div>
+            <button id="generate-captions-btn" class="btn btn-primary wide">Generate captions</button>
+            <label class="row toggle"><span class="k">Roman script (Hinglish)</span><input type="checkbox" id="roman-toggle" checked /></label>
+            <div class="row gap">
+              <button id="srt-download-btn" class="btn btn-ghost" style="flex:1">Download SRT</button>
+              <button id="captions-only-export-btn" class="btn btn-ghost" style="flex:1">Captions-only MP4</button>
+            </div>
+            <div class="k small">Caption lines <span id="line-count" class="stats"></span></div>
+            <div id="caption-lines" class="caption-lines"></div>
+            <div class="k small">Presets</div>
+            <div id="preset-grid" class="preset-grid"></div>
+          </div>
+
+          <div class="panel-page hidden" data-page="trim">
+            <div class="k">AI auto-edit</div>
+            <p class="hint">Groq Whisper word timestamps + LLaMA pass for filler words like “um”, “uh”, “so”, “you know” — keeps your delivery tight.</p>
+            <label class="row toggle"><span class="k">Remove fillers</span><input type="checkbox" id="opt-filler" checked /></label>
+            <label class="row toggle"><span class="k">Remove repetitions</span><input type="checkbox" id="opt-rep" checked /></label>
+            <label class="row toggle"><span class="k">Remove off-topic</span><input type="checkbox" id="opt-offtopic" /></label>
+            <label class="row"><span class="k">Aggression</span><input type="range" id="aggression" min="0" max="100" value="55" /></label>
+            <button id="auto-edit-btn" class="btn btn-primary wide">Auto-edit captions</button>
+            <small id="auto-edit-note" class="hint-foot"></small>
+          </div>
+
+          <div class="panel-page hidden" data-page="silence">
+            <div class="k">Silence removal</div>
+            <p class="hint">We analyze the waveform and cut dead air before corners — same cuts you get in export.</p>
+            <label class="row"><span class="k">Threshold</span><input type="range" id="silence-threshold" min="1" max="40" value="12" /></label>
+            <label class="row"><span class="k">Min silence (ms)</span><input type="range" id="silence-min" min="100" max="2000" step="50" value="450" /></label>
+            <label class="row toggle"><span class="k">Apply cuts in export</span><input type="checkbox" id="apply-cuts-toggle" checked /></label>
+            <button id="detect-silence-btn" class="btn btn-primary wide">Detect silences</button>
+            <button id="clear-cuts-btn" class="btn btn-ghost wide">Clear cuts</button>
+            <small id="silence-note" class="hint-foot"></small>
+          </div>
+
+          <div class="panel-page hidden" data-page="style">
+            <div class="k">Caption style</div>
+            <label class="row"><span class="k">Font</span>
+              <select id="font-select" class="select">
+                <option value="Bebas Neue">Bebas Neue</option>
+                <option value="Anton">Anton</option>
+                <option value="Archivo Black">Archivo Black</option>
+                <option value="Luckiest Guy">Luckiest Guy</option>
+                <option value="Rubik">Rubik 800</option>
+              </select>
+            </label>
+            <label class="row"><span class="k">Size</span><input type="range" id="font-size" min="48" max="140" value="96" /></label>
+            <label class="row"><span class="k">Highlight</span><input type="color" id="accent-color" value="#30d158" class="color" /></label>
+            <label class="row"><span class="k">Base text</span><input type="color" id="base-color" value="#ffffff" class="color" /></label>
+            <label class="row toggle"><span class="k">Uppercase</span><input type="checkbox" id="uppercase-toggle" checked /></label>
+            <div class="k small">Output</div>
+            <div class="row gap">
+              <button class="seg" data-aspect="9:16">9:16</button>
+              <button class="seg" data-aspect="16:9">16:9</button>
+              <button class="seg" data-aspect="1:1">1:1</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Preview -->
+      <section class="preview-wrap">
+        <div id="stage" class="stage" data-aspect="9:16">
+          <video id="stage-video" class="stage-video" playsinline crossorigin="anonymous"></video>
+          <div id="caption-layer" class="caption-layer"></div>
+          <div id="stage-empty" class="stage-empty">
+            <div class="empty-phone"><div class="ep-screen"><div class="ep-line"></div><div class="ep-line short"></div></div></div>
+            <p>Add media to see the preview</p>
+          </div>
+          <audio id="media-audio"></audio>
+        </div>
+        <div class="preview-badges">
+          <span class="badge" id="whisper-badge">Groq Whisper turbo</span>
+          <span class="badge subtle" id="plan-badge">Local · unlimited</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- Timeline -->
+    <section class="timeline">
+      <div class="tl-head">
+        <span class="time current" id="time-current">00:00.0</span>
+        <span class="time-sep">/</span>
+        <span class="time total" id="time-total">00:00.0</span>
+        <div class="transport">
+          <button class="icon-btn" id="back-10" title="Back 5s">‹‹</button>
+          <button class="play-btn" id="play-btn" aria-label="Play/pause"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+          <button class="icon-btn" id="fwd-10" title="Forward 5s">››</button>
+        </div>
+        <div class="tl-right">
+          <button class="icon-btn tiny" id="zoom-out">−</button>
+          <input type="range" id="zoom" min="0.5" max="4" step="0.1" value="1" class="zoom-slider" />
+          <button class="icon-btn tiny" id="zoom-in">+</button>
+          <button class="icon-btn tiny" id="fit-btn" title="Fit">⤢</button>
+        </div>
+      </div>
+      <div class="tracks" id="tracks">
+        <div class="ruler" id="ruler"></div>
+        <div class="track-row"><div class="track-label">V1</div><div class="track-lane" id="lane-v1"></div></div>
+        <div class="track-row"><div class="track-label text-lane">T</div><div class="track-lane captions" id="lane-t"></div></div>
+        <div class="track-row audio"><div class="track-label">A1</div><div class="track-lane" id="lane-a1"><canvas id="waveform"></canvas></div></div>
+        <div class="playhead" id="playhead"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Export modal -->
+  <div id="export-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="export-title">
+    <div class="modal">
+      <h2 id="export-title">Export video</h2>
+      <p class="modal-sub">Renders locally with ffmpeg — burned-in captions, your style.</p>
+      <div class="modal-grid">
+        <div class="modal-option">
+          <div class="mo-head"><span>Format</span></div>
+          <div class="row gap">
+            <button class="seg active" data-export-aspect="9:16">9:16</button>
+            <button class="seg" data-export-aspect="16:9">16:9</button>
+            <button class="seg" data-export-aspect="1:1">1:1</button>
+          </div>
+        </div>
+        <div class="modal-option">
+          <div class="mo-head"><span>Captions</span></div>
+          <div class="row gap">
+            <button class="seg active" data-export-mode="with-captions">Burned-in</button>
+            <button class="seg" data-export-mode="captions-only">Captions-only</button>
+            <button class="seg" data-export-mode="none">None</button>
+          </div>
+        </div>
+        <div class="modal-option">
+          <div class="mo-head"><span>Subtitle file</span></div>
+          <button id="modal-srt-btn" class="btn btn-ghost wide">Download SRT</button>
+        </div>
+      </div>
+      <button id="start-export-btn" class="btn btn-primary wide large">Start export</button>
+      <div id="export-progress" class="export-progress hidden">
+        <div class="bar big"><div class="fill" id="export-fill"></div></div>
+        <div class="export-progress-meta"><span id="export-stage">Starting…</span><span id="export-pct">0%</span></div>
+      </div>
+      <div id="export-done" class="export-done hidden">
+        <div class="done-check">✓</div>
+        <p>Your video is ready.</p>
+        <a id="export-download" class="btn btn-primary wide" download>Download MP4</a>
+      </div>
+      <button id="close-modal-btn" class="icon-btn modal-close" aria-label="Close">×</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
