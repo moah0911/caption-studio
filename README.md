@@ -12,6 +12,18 @@ A local, single-user, word-timed caption editor for short-form video — feature
 - **Export** with burned-in captions to 9:16 / 16:9 / 1:1 via a local ffmpeg worker (black canvas with animated word-level captions, AAC stereo), **Captions-only** black-canvas mode, or plain **SRT** download.
 - Auto-save, SQLite persistence, projects persist across sessions.
 
+## Screenshots
+
+<img src="docs/screenshots/preview-playing.png" alt="Live editor preview with captions over video" width="760" />
+
+<img src="docs/screenshots/editor.png" alt="Editor with media panel, waveform and timeline" width="760" />
+
+<img src="docs/screenshots/caption-editor.png" alt="Caption line editor and style presets" width="760" />
+
+<img src="docs/screenshots/export-modal.png" alt="Export dialog — aspect ratio, caption mode, SRT" width="760" />
+
+<img src="docs/screenshots/export-frame.png" alt="Frame from a burned-in caption export" width="760" />
+
 ## Quick start
 
 Requirements: **Node.js ≥ 24.15** (for built-in `node:sqlite`) and **ffmpeg + ffprobe** on PATH (Windows: `winget install Gyan.FFmpeg`).
